@@ -19,6 +19,20 @@ function clearBorders(){
     }
 }
 
+function arrayEqual(a,b){
+    if (a===null || b===null){
+        return false;
+    } else if (a.length!==b.length){
+        return false;
+    }
+    for (var comp=0;comp<a.length;a++){
+        if (a[comp]!==b[comp]){
+            return false;
+        }
+    }
+    return true;
+}
+
 function opposite(color){
     if (color==="w"){
         return "b";
@@ -491,6 +505,14 @@ function getPawnMoves(num,color,str){
     var thisMoveBoard = newBoard(str);
     var thisMovePieces = createPiecesArr(thisMoveBoard);
     if (color==="w"){
+        var EP1 = [num-15,num+1];
+        var EP2 = [num-17,num-1];
+        if (arrayEqual(EP1,lastmove) && thisMovePieces[num+1].type==="P" && num%8!==7){
+            thisMovePieces[num].moves.push([num,num-7]);
+        }
+        if (arrayEqual(EP2,lastmove) && thisMovePieces[num-1].type==="P" && num%8!==0){
+            thisMovePieces[num].moves.push([num,num-9]);
+        }
         if (thisMovePieces[num-7]&& thisMovePieces[num-7].color==="b" && num%8!==7){
             thisMovePieces[num].moves.push([num,num-7]);
         }
@@ -504,6 +526,12 @@ function getPawnMoves(num,color,str){
             }
         }
     } else if (color==="b"){
+        if (arrayEqual(lastmove,[num+17,num+1]) && thisMovePieces[num+1].type==="P" && num%8!==0){
+            thisMovePieces[num].moves.push([num,num+9]);
+        }
+        if (arrayEqual(lastmove,[num+15,num-1]) && thisMovePieces[num-1].type==="P" && num%8!==7){
+            thisMovePieces[num].moves.push([num,num+7]);
+        }
         if (thisMovePieces[num+7]&& thisMovePieces[num+7].color==="w" && num%8!==0){
             thisMovePieces[num].moves.push([num,num+7]);
         }
@@ -580,6 +608,29 @@ function Destination(num1,num2){
         boardString = boardString.substring(0,boardString.length-1);
         boardString += opposite(pieces[num1].color);
     }
+    if (pieces[num1].type==="P"){
+        if (num2===num1-7 && !pieces[num2]){
+            var newString = boardString.substring(0,(num2)*2+16);
+            newString += 'ee';
+            newString += boardString.substring((num2)*2+18,boardString.length);
+            boardString = newString;
+        } else if (num2===num1-9 && !pieces[num2]){
+            var newString = boardString.substring(0,(num2)*2+16);
+            newString += 'ee';
+            newString += boardString.substring((num2)*2+18,boardString.length);
+            boardString = newString;
+        } else if (num2===num1+7 && !pieces[num2]){
+            var newString = boardString.substring(0,(num2)*2-16);
+            newString += 'ee';
+            newString += boardString.substring((num2)*2-14,boardString.length);
+            boardString = newString;
+        } else if (num2===num1+9 && !pieces[num2]){
+            var newString = boardString.substring(0,(num2)*2-16);
+            newString += 'ee';
+            newString += boardString.substring((num2)*2-14,boardString.length);
+            boardString = newString;
+        }
+    }
     board = newBoard(boardString);
     pieces = createPiecesArr(board);
     clearBorders();
@@ -596,6 +647,7 @@ function Destination(num1,num2){
     } else if (num1===56){
         canCastle.wRLmoved = 1;
     }
+    lastmove = [num1,num2];
     doThing();
 }
 
@@ -695,4 +747,5 @@ var canCastle = {
     wRRmoved : 0,
     wRLmoved : 0
 }
+var lastmove = [];
 var pieces = createPiecesArr(board);

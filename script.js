@@ -36,25 +36,31 @@ function createPiecesArr(board){
     return newPiecesArr;
 }
 
-function swapBoardString(str,num1,num2){
-    if (num1<num2){
-        newString = str.substring(0,num1*2);
-        newString += "ee";
-        newString += str.substring(num1*2+2,num2*2);
-        newString += str[num1*2];
-        newString += str[num1*2+1];
-        newString += str.substring(num2*2+2,str.length-1);
-        newString += opposite(str[128]);
-    } else {
-        newString = str.substring(0,num2*2);
-        newString += str[num1*2];
-        newString += str[num1*2+1];
-        newString += str.substring(num2*2+2,num1*2);
-        newString += "ee";
-        newString += str.substring(num1*2+2,str.length-1);
-        newString += opposite(str[128]);
-    }
-    return newString;
+function swapBoardString(str,numFrom,numTo){
+    //if(numFrom<64 && numFrom>=0 && numTo<64 && numTo>=0){
+        console.log("moving " + numFrom + " to " + numTo);
+        if (numFrom<numTo){
+            newString = str.substring(0,numFrom*2);
+            newString += "ee";
+            newString += str.substring(numFrom*2+2,numTo*2);
+            newString += str[numFrom*2];
+            newString += str[numFrom*2+1];
+            newString += str.substring(numTo*2+2,str.length-1);
+            newString += opposite(str[128]);
+        } else {
+            newString = str.substring(0,numTo*2);
+            newString += str[numFrom*2];
+            newString += str[numFrom*2+1];
+            newString += str.substring(numTo*2+2,numFrom*2);
+            newString += "ee";
+            newString += str.substring(numFrom*2+2,str.length-1);
+            newString += opposite(str[128]);
+        }
+        return newString;
+    //}
+    //else {
+        //return "";
+    //}
 }
 
 function check (str,color){
@@ -69,9 +75,62 @@ function check (str,color){
     }
     else {
         var king = color + "K";
-        var kingSpace = (str.indexof(king)/2);
-        console.log (kingSpace);
-
+        var kingSpace = Math.floor((str.indexOf(king)/2));
+        console.log(kingSpace);
+        console.log("Check string = "+ str );
+        var bishCheck = getBishopMoves(kingSpace,color,str);
+        var rookCheck = getRookMoves(kingSpace,color,str);
+        var knightCheck = getKnightMoves(kingSpace,color,str);
+        var checkBoard = newBoard(str);
+        var checkPieces = createPiecesArr(checkBoard);
+        if (bishCheck.length>0){
+            for (var bcheck=0;bcheck<bishCheck.length;bcheck++){
+                if (checkPieces[bishCheck[bcheck][1]]){
+                    if (checkPieces[bishCheck[bcheck][1]].type==="B" || checkPieces[bishCheck[bcheck][1]].type==="Q"){
+                        return true;
+                    }
+                }
+            }
+        }
+        if (rookCheck.length>0){
+            for (var rcheck=0;rcheck<rookCheck.length;rcheck++){
+                if (checkPieces[rookCheck[rcheck][1]]){
+                    if (checkPieces[rookCheck[rcheck][1]].type==="R" || checkPieces[rookCheck[rcheck][1]].type==="Q"){
+                        return true;
+                    }
+                }
+            }
+        }
+        if (knightCheck.length>0){
+            for (var kcheck=0;kcheck<knightCheck.length;kcheck++){
+                if (checkPieces[knightCheck[kcheck][1]]){
+                    if (checkPieces[knightCheck[kcheck][1]].type==="K"){
+                        return true;
+                    }
+                }
+            }
+        }
+        if (color==="w"){
+            if (checkPieces[kingSpace-7]){
+                if (checkPieces[kingSpace-7].type==="P" && checkPieces[kingSpace-7].color==="b"){
+                    return true;
+                }
+            } else if (checkPieces[kingSpace-9]){
+                if (checkPieces[kingSpace-9].type==="P" && checkPieces[kingSpace-9].color==="b"){
+                    return true;
+                }
+            }
+        } else {
+            if (checkPieces[kingSpace+7]){
+                if (checkPieces[kingSpace+7].type==="P" && checkPieces[kingSpace+7].color==="w"){
+                    return true;
+                }
+            } else if (checkPieces[kingSpace+9]){
+                if (checkPieces[kingSpace+9].type==="P" && checkPieces[kingSpace+9].color==="w"){
+                    return true;
+                }
+            }
+        }
     }
     return false;
 }
@@ -135,6 +194,7 @@ function getBishopMoves(num,color,str){
             break;
         }
     }
+    console.log(num);
     return thisMovePieces[num].moves;
 }
 function getRookMoves(num,color,str){
@@ -203,13 +263,12 @@ function getRookMoves(num,color,str){
 
 
 
-function getKingMoves(num,color){
+function getKingMoves(num,color,str){
     var movesArr = [];
-    var lastLeftSpace = Math.floor(num/8) * 8;
-    var lastRightSpace = lastLeftSpace + 7;
     if(num+1<64){
         if (num+8<64){
-            if (!check((num+8),color)){
+            var checkString = swapBoardString(str,num,num+8);
+            if (!check(checkString,color)){
                 if (!pieces[num+8]){
                     movesArr.push([num,num+8]);
                 } else if (pieces[num+8].color===opposite(color)){
@@ -218,7 +277,9 @@ function getKingMoves(num,color){
             }
         } 
         if (num+7<64){
-            if (!check((num+7),color)){
+            console.log(num+7);
+            var checkString = swapBoardString(str,num,num+7);
+            if (!check(checkString,color)){
                 if (!pieces[num+7] && num%8!==0){
                     movesArr.push([num,num+7]);
                 } else if(!pieces[num+7]){
@@ -229,7 +290,8 @@ function getKingMoves(num,color){
             }
         }
         if (num+9<64){
-            if (!check((num+9),color)){
+            var checkString = swapBoardString(str,num,num+9);
+            if (!check(checkString,color)){
                 if (!pieces[num+9] && num%8!==7){
                     movesArr.push([num,num+9]);
                 } else if(!pieces[num+9]){
@@ -239,7 +301,8 @@ function getKingMoves(num,color){
                 }
             }
         }
-        if (!check((num+1),color)){
+        var checkString = swapBoardString(str,num,num+1);
+        if (!check(checkString,color)){
             if (!pieces[num+1] & num%8!==7){
                 movesArr.push([num,num+1]);
             } else if(!pieces[num+1]){
@@ -251,7 +314,8 @@ function getKingMoves(num,color){
     }
     if (num-1>=0){
         if (num-8>=0){
-            if (!check((num-8),color)){
+            var checkString = swapBoardString(str,num,num-8);
+            if (!check(checkString,color)){
                 if (!pieces[num-8]){
                     movesArr.push([num,num-8]);
                 } else if (pieces[num-8].color===opposite(color)){
@@ -260,7 +324,8 @@ function getKingMoves(num,color){
             }
         } 
         if (num-7>=0){
-            if (!check((num-7),color)){
+            var checkString = swapBoardString(str,num,num-7);
+            if (!check(checkString,color)){
                 if (!pieces[num-7] && num%8!==7){
                     movesArr.push([num,num-7]);
                 } else if(!pieces[num-7]){
@@ -271,7 +336,8 @@ function getKingMoves(num,color){
             }
         }
         if (num-9>=0){
-            if (!check((num-9),color)){
+            var checkString = swapBoardString(str,num,num-9);
+            if (!check(checkString,color)){
                 if (!pieces[num-9] && num%8!==0){
                     movesArr.push([num,num-9]);
                 } else if(!pieces[num-9]){
@@ -281,7 +347,8 @@ function getKingMoves(num,color){
                 }
             }
         }
-        if (!check((num-1),color)){
+        var checkString = swapBoardString(str,num,num-1);
+        if (!check(checkString,color)){
             if (!pieces[num-1] && num%8!==0){
                 movesArr.push([num,num-1]);
             } else if(!pieces[num-1]){
@@ -294,124 +361,137 @@ function getKingMoves(num,color){
     return movesArr;
 }
 
+function getKnightMoves(num,color,str){
+    var thisMoveBoard = newBoard(str);
+    var thisMovePieces = createPiecesArr(thisMoveBoard);
+    if (num-17 >=0){
+        if (num%8!==0){
+            if (!thisMovePieces[num-17]){
+                thisMovePieces[num].moves.push([num,num-17]);
+            } 
+            else if (thisMovePieces[num-17].color===opposite(color)){
+                thisMovePieces[num].moves.push([num,num-17]);
+            }
+        }
+    }
+    
+    if (num-15 >=0){
+        if (num%8!==7){
+            if (!thisMovePieces[num-15]){
+                thisMovePieces[num].moves.push([num,num-15]);
+            } 
+            else if (thisMovePieces[num-15].color===opposite(color)){
+                thisMovePieces[num].moves.push([num,num-15]);
+            }
+        }
+    }
+    
+    if (num-10 >=0){
+        if (num%8>1){
+            if (!thisMovePieces[num-10]){
+                thisMovePieces[num].moves.push([num,num-10]);
+            } 
+            else if (thisMovePieces[num-10].color===opposite(color)){
+                thisMovePieces[num].moves.push([num,num-10]);
+            }
+        }
+    }
+    
+    if (num-6 >=0){
+        if (num%8<6){
+            if (!thisMovePieces[num-6]){
+                thisMovePieces[num].moves.push([num,num-6]);
+            } 
+            else if (thisMovePieces[num-6].color===opposite(color)){
+                thisMovePieces[num].moves.push([num,num-6]);
+            }
+        }
+    }
+   
+    if (num+17<=63){
+        if (num%8!==7){
+            if (!thisMovePieces[num+17]){
+                thisMovePieces[num].moves.push([num,num+17]);
+            } 
+            else if (thisMovePieces[num+17].color===opposite(color)){
+                thisMovePieces[num].moves.push([num,num+17]);
+            }
+        }
+    }
+    
+    if (num+15<=63){
+        if (num%8!==0){
+            if (!thisMovePieces[num+15]){
+                thisMovePieces[num].moves.push([num,num+15]);
+            }
+            else if (thisMovePieces[num+15].color===opposite(color)){
+                thisMovePieces[num].moves.push([num,num+15]);
+            }
+        }
+    }
+    
+    if (num+10<=63){
+        if (num%8<6){
+            if (!thisMovePieces[num+10]){
+                thisMovePieces[num].moves.push([num,num+10]);
+            } 
+            else if (thisMovePieces[num+10].color===opposite(color)){
+                thisMovePieces[num].moves.push([num,num+10]);
+            }
+        }
+    }
+    
+    if (num+6<=63){
+        if (num%8>1){
+            if (!thisMovePieces[num+6]){
+                thisMovePieces[num].moves.push([num,num+6])
+            } 
+            else if (thisMovePieces[num+6].color===opposite(color)){
+                thisMovePieces[num].moves.push([num,num+6]);
+            }
+        }
+    }
+    return thisMovePieces[num].moves;
+}
+
+function getPawnMoves(num,color,str){
+    var thisMoveBoard = newBoard(str);
+    var thisMovePieces = createPiecesArr(thisMoveBoard);
+    if (color==="w"){
+        if (thisMovePieces[num-7]&& thisMovePieces[num-7].color==="b"){
+            thisMovePieces[num].moves.push([num,num-7]);
+        }
+        if (thisMovePieces[num-9] && thisMovePieces[num-9].color==="b"){
+            thisMovePieces[num].moves.push([num,num-9]);
+        }
+        if (!thisMovePieces[num-8]){
+            thisMovePieces[num].moves.push([num,num-8]);
+            if (num/8>=6 && !thisMovePieces[num-16]){
+                thisMovePieces[num].moves.push([num,num-16]);
+            }
+        }
+    } else if (color==="b"){
+        if (thisMovePieces[num+7]&& thisMovePieces[num+7].color==="w"){
+            thisMovePieces[num].moves.push([num,num+7]);
+        }
+        if (thisMovePieces[num+9] && thisMovePieces[num+9].color==="w"){
+            thisMovePieces[num].moves.push([num,num+9]);
+        }
+        if (!thisMovePieces[num+8]){
+            thisMovePieces[num].moves.push([num,num+8]);
+            if (num/8<2 && !thisMovePieces[num+16]){
+                thisMovePieces[num].moves.push([num,num+16]);
+            }
+        }
+    }
+    return thisMovePieces[num].moves;
+}
+
 function findMoves(num,type,color,str){
     if (type==="P"){
-        if (color==="w"){
-            if (pieces[num-7]&& pieces[num-7].color==="b"){
-                pieces[num].moves.push([num,num-7]);
-            }
-            if (pieces[num-9] && pieces[num-9].color==="b"){
-                pieces[num].moves.push([num,num-9]);
-            }
-            if (!pieces[num-8]){
-                pieces[num].moves.push([num,num-8]);
-                if (num/8>=6 && !pieces[num-16]){
-                    pieces[num].moves.push([num,num-16]);
-                }
-            }
-        } else if (color==="b"){
-            if (pieces[num+7]&& pieces[num+7].color==="w"){
-                pieces[num].moves.push([num,num+7]);
-            }
-            if (pieces[num+9] && pieces[num+9].color==="w"){
-                pieces[num].moves.push([num,num+9]);
-            }
-            if (!pieces[num+8]){
-                pieces[num].moves.push([num,num+8]);
-                if (num/8<2 && !pieces[num+16]){
-                    pieces[num].moves.push([num,num+16]);
-                }
-            }
-        }
+        pieces[num].moves = getPawnMoves(num,color,str);
     } else if (type==="N"){
-        
-        if (num-17 >=0){
-            if (num%8!==0){
-                if (!pieces[num-17]){
-                    pieces[num].moves.push([num,num-17]);
-                } 
-                else if (pieces[num-17].color===opposite(color)){
-                    pieces[num].moves.push([num,num-17]);
-                }
-            }
-        }
-        
-        if (num-15 >=0){
-            if (num%8!==7){
-                if (!pieces[num-15]){
-                    pieces[num].moves.push([num,num-15]);
-                } 
-                else if (pieces[num-15].color===opposite(color)){
-                    pieces[num].moves.push([num,num-15]);
-                }
-            }
-        }
-        
-        if (num-10 >=0){
-            if (num%8>1){
-                if (!pieces[num-10]){
-                    pieces[num].moves.push([num,num-10]);
-                } 
-                else if (pieces[num-10].color===opposite(color)){
-                    pieces[num].moves.push([num,num-10]);
-                }
-            }
-        }
-        
-        if (num-6 >=0){
-            if (num%8<6){
-                if (!pieces[num-6]){
-                    pieces[num].moves.push([num,num-6]);
-                } 
-                else if (pieces[num-6].color===opposite(color)){
-                    pieces[num].moves.push([num,num-6]);
-                }
-            }
-        }
-       
-        if (num+17<=63){
-            if (num%8!==7){
-                if (!pieces[num+17]){
-                    pieces[num].moves.push([num,num+17]);
-                } 
-                else if (pieces[num+17].color===opposite(color)){
-                    pieces[num].moves.push([num,num+17]);
-                }
-            }
-        }
-        
-        if (num+15<=63){
-            if (num%8!==0){
-                if (!pieces[num+15]){
-                    pieces[num].moves.push([num,num+15]);
-                }
-                else if (pieces[num+15].color===opposite(color)){
-                    pieces[num].moves.push([num,num+15]);
-                }
-            }
-        }
-        
-        if (num+10<=63){
-            if (num%8<6){
-                if (!pieces[num+10]){
-                    pieces[num].moves.push([num,num+10]);
-                } 
-                else if (pieces[num+10].color===opposite(color)){
-                    pieces[num].moves.push([num,num+10]);
-                }
-            }
-        }
-        
-        if (num+6<=63){
-            if (num%8>1){
-                if (!pieces[num+6]){
-                    pieces[num].moves.push([num,num+6])
-                } 
-                else if (pieces[num+6].color===opposite(color)){
-                    pieces[num].moves.push([num,num+6]);
-                }
-            }
-        }
+        pieces[num].moves = getKnightMoves(num,color,str);
     } else if (type==="B"){
         pieces[num].moves = getBishopMoves(num,color,str);
     } else if (type==="R"){
@@ -423,7 +503,7 @@ function findMoves(num,type,color,str){
             pieces[num].moves.push(qRookMoves[addRookMoves]);
         }
     } else if (type==="K"){
-        pieces[num].moves = getKingMoves(num,color);
+        pieces[num].moves = getKingMoves(num,color,str);
     }
 }
 

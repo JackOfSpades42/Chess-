@@ -194,7 +194,6 @@ function getBishopMoves(num,color,str){
             break;
         }
     }
-    console.log(num);
     return thisMovePieces[num].moves;
 }
 function getRookMoves(num,color,str){
@@ -277,7 +276,6 @@ function getKingMoves(num,color,str){
             }
         } 
         if (num+7<64){
-            console.log(num+7);
             var checkString = swapBoardString(str,num,num+7);
             if (!check(checkString,color)){
                 if (!pieces[num+7] && num%8!==0){

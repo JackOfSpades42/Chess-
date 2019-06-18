@@ -144,6 +144,29 @@ function check (str,color){
     return false;
 }
 
+function checkmate(str){
+    var checkmateBoard = newBoard(str);
+    var checkmatePieces = createPiecesArr(checkmateBoard);
+    var colorMated = str[128];
+    var allMoves = [];
+    console.log(str);
+    console.log(checkmatePieces);
+    for (var mateCheck=0;mateCheck<checkmatePieces.length;mateCheck++){
+        if (checkmatePieces[mateCheck]){
+            if (checkmatePieces[mateCheck].color===colorMated){
+                var newMoves = findMoves(mateCheck,checkmatePieces[mateCheck].type,colorMated,str);
+                for (var addMoves=0;addMoves<newMoves.length;addMoves++){
+                    allMoves.push(newMoves[addMoves]);
+                }
+            }
+        }
+    }
+    if (allMoves.length>0){
+        return false;
+    }
+    return true;
+}
+
 function getBishopMoves(num,color,str,func){
     var thisMoveBoard = newBoard(str);
     var thisMovePieces = createPiecesArr(thisMoveBoard);
@@ -571,9 +594,11 @@ function getPawnMoves(num,color,str,func){
     if (color==="w"){
         var EP1 = [num-15,num+1];
         var EP2 = [num-17,num-1];
-        if (arrayEqual(EP1,lastmove) && thisMovePieces[num+1].type==="P" && num%8!==7){
-            if (!func(swapBoardString(str,num,num-7),color)){
-                thisMovePieces[num].moves.push([num,num-7]);
+        if (thisMovePieces[num+1]){
+            if (arrayEqual(EP1,lastmove) && thisMovePieces[num+1].type==="P" && num%8!==7){
+                if (!func(swapBoardString(str,num,num-7),color)){
+                    thisMovePieces[num].moves.push([num,num-7]);
+                }
             }
         }
         if (arrayEqual(EP2,lastmove) && thisMovePieces[num-1].type==="P" && num%8!==0){
@@ -602,9 +627,11 @@ function getPawnMoves(num,color,str,func){
             }
         }
     } else if (color==="b"){
-        if (arrayEqual(lastmove,[num+17,num+1]) && thisMovePieces[num+1].type==="P" && num%8!==0){
-            if (!func(swapBoardString(str,num,num+9),color)){
-                thisMovePieces[num].moves.push([num,num+9]);
+        if (thisMovePieces[num+1]){
+            if (arrayEqual(lastmove,[num+17,num+1]) && thisMovePieces[num+1].type==="P" && num%8!==0){
+                if (!func(swapBoardString(str,num,num+9),color)){
+                    thisMovePieces[num].moves.push([num,num+9]);
+                }
             }
         }
         if (arrayEqual(lastmove,[num+15,num-1]) && thisMovePieces[num-1].type==="P" && num%8!==7){
@@ -637,23 +664,25 @@ function getPawnMoves(num,color,str,func){
 }
 
 function findMoves(num,type,color,str){
+    var moveArr = [];
     if (type==="P"){
-        pieces[num].moves = getPawnMoves(num,color,str,check);
+        moveArr = getPawnMoves(num,color,str,check);
     } else if (type==="N"){
-        pieces[num].moves = getKnightMoves(num,color,str,check);
+        moveArr = getKnightMoves(num,color,str,check);
     } else if (type==="B"){
-        pieces[num].moves = getBishopMoves(num,color,str,check);
+        moveArr = getBishopMoves(num,color,str,check);
     } else if (type==="R"){
-        pieces[num].moves = getRookMoves(num,color,str,check);
+        moveArr = getRookMoves(num,color,str,check);
     } else if (type==="Q"){
-        pieces[num].moves = getBishopMoves(num,color,str,check);
+        moveArr = getBishopMoves(num,color,str,check);
         var qRookMoves = getRookMoves(num,color,str,check);
         for (var addRookMoves=0;addRookMoves<qRookMoves.length;addRookMoves++){
-            pieces[num].moves.push(qRookMoves[addRookMoves]);
+            moveArr.push(qRookMoves[addRookMoves]);
         }
     } else if (type==="K"){
-        pieces[num].moves = getKingMoves(num,color,str);
+        moveArr = getKingMoves(num,color,str);
     }
+    return moveArr;
 }
 
 function showMove(num,type,color,str){
@@ -664,7 +693,7 @@ function showMove(num,type,color,str){
     pieces[num].moves = [];
     clearBorders();
     console.log(num + " " + color + type);
-    findMoves(num,type,color,str);
+    pieces[num].moves = findMoves(num,type,color,str);
     //console.log(pieces[num].moves);
     for (var mov=0;mov<pieces[num].moves.length;mov++){
         console.log(pieces[num].moves[mov]);
@@ -795,7 +824,7 @@ function doThing(){
             clearOnclick(boxes[cc]);
         }
     }
-    if (check(boardString,boardString[128])){
+    if (check(boardString,boardString[128]) && !checkmate(boardString)){
         if (document.body.lastChild!==checkShowing){
             document.body.append("Check!");
             checkShowing = document.body.lastChild;
@@ -804,6 +833,9 @@ function doThing(){
         if (document.body.lastChild===checkShowing){
             document.body.removeChild(document.body.lastChild);
         }
+    } else if (checkmate(boardString)){
+        document.body.append("Checkmate!");
+        alert("Game Over!");
     }
 }
 function removeImages(){

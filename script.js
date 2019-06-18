@@ -601,19 +601,25 @@ function getPawnMoves(num,color,str,func){
                 }
             }
         }
-        if (arrayEqual(EP2,lastmove) && thisMovePieces[num-1].type==="P" && num%8!==0){
-            if (!func(swapBoardString(str,num,num-9),color)){
-                thisMovePieces[num].moves.push([num,num-9]);
+        if (thisMovePieces[num-1]){
+            if (arrayEqual(EP2,lastmove) && thisMovePieces[num-1].type==="P" && num%8!==0){
+                if (!func(swapBoardString(str,num,num-9),color)){
+                    thisMovePieces[num].moves.push([num,num-9]);
+                }
             }
         }
-        if (thisMovePieces[num-7]&& thisMovePieces[num-7].color==="b" && num%8!==7){
-            if (!func(swapBoardString(str,num,num-7),color)){
-                thisMovePieces[num].moves.push([num,num-7]);
+        if (thisMovePieces[num-7]){
+            if (thisMovePieces[num-7]&& thisMovePieces[num-7].color==="b" && num%8!==7){
+                if (!func(swapBoardString(str,num,num-7),color)){
+                    thisMovePieces[num].moves.push([num,num-7]);
+                }
             }
         }
-        if (thisMovePieces[num-9] && thisMovePieces[num-9].color==="b" && num%8!==0){
-            if (!func(swapBoardString(str,num,num-9),color)){
-                thisMovePieces[num].moves.push([num,num-9]);
+        if (thisMovePieces[num-9]){
+            if (thisMovePieces[num-9] && thisMovePieces[num-9].color==="b" && num%8!==0){
+                if (!func(swapBoardString(str,num,num-9),color)){
+                    thisMovePieces[num].moves.push([num,num-9]);
+                }
             }
         }
         if (!thisMovePieces[num-8]){
@@ -634,19 +640,25 @@ function getPawnMoves(num,color,str,func){
                 }
             }
         }
-        if (arrayEqual(lastmove,[num+15,num-1]) && thisMovePieces[num-1].type==="P" && num%8!==7){
-            if (!func(swapBoardString(str,num,num+7),color)){
-                thisMovePieces[num].moves.push([num,num+7]);
+        if (thisMovePieces[num-1]){
+            if (arrayEqual(lastmove,[num+15,num-1]) && thisMovePieces[num-1].type==="P" && num%8!==7){
+                if (!func(swapBoardString(str,num,num+7),color)){
+                    thisMovePieces[num].moves.push([num,num+7]);
+                }
             }
         }
-        if (thisMovePieces[num+7]&& thisMovePieces[num+7].color==="w" && num%8!==0){
-            if (!func(swapBoardString(str,num,num+7),color)){
-                thisMovePieces[num].moves.push([num,num+7]);
+        if (thisMovePieces[num+7]){
+            if (thisMovePieces[num+7]&& thisMovePieces[num+7].color==="w" && num%8!==0){
+                if (!func(swapBoardString(str,num,num+7),color)){
+                    thisMovePieces[num].moves.push([num,num+7]);
+                }
             }
         }
-        if (thisMovePieces[num+9] && thisMovePieces[num+9].color==="w" && num%8!==7){
-            if (!func(swapBoardString(str,num,num+9),color)){
-                thisMovePieces[num].moves.push([num,num+9]);
+        if (thisMovePieces[num+9]){
+            if (thisMovePieces[num+9] && thisMovePieces[num+9].color==="w" && num%8!==7){
+                if (!func(swapBoardString(str,num,num+9),color)){
+                    thisMovePieces[num].moves.push([num,num+9]);
+                }
             }
         }
         if (!thisMovePieces[num+8]){

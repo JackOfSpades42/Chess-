@@ -456,10 +456,10 @@ function getPawnMoves(num,color,str){
     var thisMoveBoard = newBoard(str);
     var thisMovePieces = createPiecesArr(thisMoveBoard);
     if (color==="w"){
-        if (thisMovePieces[num-7]&& thisMovePieces[num-7].color==="b"){
+        if (thisMovePieces[num-7]&& thisMovePieces[num-7].color==="b" && num%8!==7){
             thisMovePieces[num].moves.push([num,num-7]);
         }
-        if (thisMovePieces[num-9] && thisMovePieces[num-9].color==="b"){
+        if (thisMovePieces[num-9] && thisMovePieces[num-9].color==="b" && num%8!==0){
             thisMovePieces[num].moves.push([num,num-9]);
         }
         if (!thisMovePieces[num-8]){
@@ -469,10 +469,10 @@ function getPawnMoves(num,color,str){
             }
         }
     } else if (color==="b"){
-        if (thisMovePieces[num+7]&& thisMovePieces[num+7].color==="w"){
+        if (thisMovePieces[num+7]&& thisMovePieces[num+7].color==="w" && num%8!==0){
             thisMovePieces[num].moves.push([num,num+7]);
         }
-        if (thisMovePieces[num+9] && thisMovePieces[num+9].color==="w"){
+        if (thisMovePieces[num+9] && thisMovePieces[num+9].color==="w" && num%8!==7){
             thisMovePieces[num].moves.push([num,num+9]);
         }
         if (!thisMovePieces[num+8]){

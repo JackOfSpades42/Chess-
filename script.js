@@ -157,6 +157,9 @@ function checkmate(str){
                 var newMoves = findMoves(mateCheck,checkmatePieces[mateCheck].type,colorMated,str);
                 for (var addMoves=0;addMoves<newMoves.length;addMoves++){
                     allMoves.push(newMoves[addMoves]);
+                    if (allMoves.length>0){
+                        return false;
+                    }
                 }
             }
         }
@@ -165,6 +168,36 @@ function checkmate(str){
         return false;
     }
     return true;
+}
+
+function promote(str){
+    console.log(str);
+    promoteBoard = newBoard(str);
+    promotePieces = createPiecesArr(promoteBoard);
+    for (var firstCheck=0;firstCheck<8;firstCheck++){
+        if (promotePieces[firstCheck]){
+            console.log("first row");
+            if (promotePieces[firstCheck].type==="P"){
+                var newStr = str.substring(0,firstCheck*2);
+                newStr += "wQ";
+                newStr += str.substring(firstCheck*2+2,str.length);
+                console.log(newStr);
+                return newStr; 
+            }
+        }
+    }
+    for (var secondCheck=56;secondCheck<64;secondCheck++){
+        if (promotePieces[secondCheck]){
+            console.log("lastrow");
+            if (promotePieces[secondCheck].type==="P"){
+                var newStr = str.substring(0,secondCheck*2);
+                newStr += "bQ";
+                newStr += str.substring(secondCheck*2+2,str.length);
+                console.log(newStr);
+                return newStr;
+            }
+        }
+    }
 }
 
 function getBishopMoves(num,color,str,func){
@@ -710,13 +743,13 @@ function showMove(num,type,color,str){
     for (var mov=0;mov<pieces[num].moves.length;mov++){
         console.log(pieces[num].moves[mov]);
         addBorder(pieces[num].moves[mov][1]);
-        addDestinationFunction(num,pieces[num].moves[mov][1]);
+        addDestinationFunction(num,pieces[num].moves[mov][1],str);
         //console.log(pieces[num].moves[mov]);
     }
     addSelectionBorder(num);
 }
 
-function Destination(num1,num2){
+function Destination(num1,num2,str){
     removeImages();
     console.log(num2);
     boardString = swapBoardString(boardString,num1,num2);
@@ -758,6 +791,9 @@ function Destination(num1,num2){
             newString += 'ee';
             newString += boardString.substring((num2)*2-14,boardString.length);
             boardString = newString;
+        }
+        if (Math.floor(num2/8)===0 || Math.floor(num2/8)===7){
+            boardString = promote(boardString);
         }
     }
     board = newBoard(boardString);
@@ -813,9 +849,9 @@ function clearOnclick(box){
     box.onclick = function(){}
 }
 
-function addDestinationFunction(num1,num2){
+function addDestinationFunction(num1,num2,str){
     var boxes = document.getElementsByClassName("box64");
-    boxes[num2].onclick = function(){Destination(num1,num2);}
+    boxes[num2].onclick = function(){Destination(num1,num2,str);}
 }
 
 function doThing(){

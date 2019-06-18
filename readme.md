@@ -1,0 +1,1 @@
+This one is easy, just download all the files and open the html file in a web browser (chrome preferred)

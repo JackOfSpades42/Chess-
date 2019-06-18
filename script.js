@@ -36,6 +36,31 @@ function createPiecesArr(board){
     return newPiecesArr;
 }
 
+function swapBoardString(str,num1,num2){
+    if (num1<num2){
+        newString = str.substring(0,num1*2);
+        newString += "ee";
+        newString += str.substring(num1*2+2,num2*2);
+        newString += str[num1*2];
+        newString += str[num1*2+1];
+        newString += str.substring(num2*2+2,str.length-1);
+        newString += opposite(str[128]);
+    } else {
+        newString = str.substring(0,num2*2);
+        newString += str[num1*2];
+        newString += str[num1*2+1];
+        newString += str.substring(num2*2+2,num1*2);
+        newString += "ee";
+        newString += str.substring(num1*2+2,str.length-1);
+        newString += opposite(str[128]);
+    }
+    return newString;
+}
+
+function check (str,color){
+    return false;
+}
+
 function getBishopMoves(num,color){
     for (var topRightFile=1;topRightFile<8;topRightFile++){
         if (num-(topRightFile*7)>=0 && (num-(topRightFile*7))%8!==0){
@@ -154,10 +179,10 @@ function getRookMoves(num,color){
         }
     }
 }
+
+
+
 function getKingMoves(num,color){
-    function check (number,colour){
-        return false;
-    }
     var movesArr = [];
     var lastLeftSpace = Math.floor(num/8) * 8;
     var lastRightSpace = lastLeftSpace + 7;
@@ -399,26 +424,7 @@ function showMove(num,type,color){
 function Destination(num1,num2){
     removeImages();
     console.log(num2);
-    var newString = "";
-    if (num1<num2){
-        newString = boardString.substring(0,num1*2);
-        newString += "ee";
-        newString += boardString.substring(num1*2+2,num2*2);
-        newString += boardString[num1*2];
-        newString += boardString[num1*2+1];
-        newString += boardString.substring(num2*2+2,boardString.length-1);
-        newString += opposite(boardString[128]);
-        boardString = newString;
-    } else {
-        newString = boardString.substring(0,num2*2);
-        newString += boardString[num1*2];
-        newString += boardString[num1*2+1];
-        newString += boardString.substring(num2*2+2,num1*2);
-        newString += "ee";
-        newString += boardString.substring(num1*2+2,boardString.length-1);
-        newString += opposite(boardString[128]);
-        boardString = newString;
-    }
+    boardString = swapBoardString(boardString,num1,num2);
     board = newBoard(boardString);
     pieces = createPiecesArr(board);
     clearBorders();

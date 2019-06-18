@@ -37,8 +37,7 @@ function createPiecesArr(board){
 }
 
 function swapBoardString(str,numFrom,numTo){
-    //if(numFrom<64 && numFrom>=0 && numTo<64 && numTo>=0){
-        console.log("moving " + numFrom + " to " + numTo);
+        //console.log("moving " + numFrom + " to " + numTo);
         if (numFrom<numTo){
             newString = str.substring(0,numFrom*2);
             newString += "ee";
@@ -57,10 +56,6 @@ function swapBoardString(str,numFrom,numTo){
             newString += opposite(str[128]);
         }
         return newString;
-    //}
-    //else {
-        //return "";
-    //}
 }
 
 function check (str,color){
@@ -76,8 +71,8 @@ function check (str,color){
     else {
         var king = color + "K";
         var kingSpace = Math.floor((str.indexOf(king)/2));
-        console.log(kingSpace);
-        console.log("Check string = "+ str );
+        //console.log(kingSpace);
+       //console.log("Check string = "+ str );
         var bishCheck = getBishopMoves(kingSpace,color,str);
         var rookCheck = getRookMoves(kingSpace,color,str);
         var knightCheck = getKnightMoves(kingSpace,color,str);
@@ -356,6 +351,46 @@ function getKingMoves(num,color,str){
             }
         }
     }
+    if (color==="w"){
+        if (!canCastle.wKmoved && !canCastle.wRRmoved){
+            if (!pieces[61] && !pieces[62] && !check(str,"w")){
+                var checkString = swapBoardString(str,num,61);
+                var checkString2 = swapBoardString(str,num,62);
+                if (!check(checkString,"w") && !check(checkString2,"w")){
+                    movesArr.push([num,62]);
+                }
+            }
+        }
+        if (!canCastle.wKmoved && !canCastle.wRLmoved){
+            if (!pieces[59] && !pieces[58] && !check(str,"w")){
+                var checkString = swapBoardString(str,num,58);
+                var checkString2 = swapBoardString(str,num,59);
+                if (!check(checkString,"w") && !check(checkString2,"w")){
+                    movesArr.push([num,58]);
+                }
+            }
+        }
+    }
+    if (color==="b"){
+        if (!canCastle.bKmoved && !canCastle.bRRmoved){
+            if (!pieces[5] && !pieces[6] && !check(str,"b")){
+                var checkString = swapBoardString(str,num,5);
+                var checkString2 = swapBoardString(str,num,6);
+                if (!check(checkString,"b") && !check(checkString2,"b")){
+                    movesArr.push([num,6]);
+                }
+            }
+        }
+        if (!canCastle.bKmoved && !canCastle.bRLmoved){
+            if (!pieces[3] && !pieces[2] && !check(str,"b")){
+                var checkString = swapBoardString(str,num,3);
+                var checkString2 = swapBoardString(str,num,2);
+                if (!check(checkString,"b") && !check(checkString2,"b")){
+                    movesArr.push([num,2]);
+                }
+            }
+        }
+    }
     return movesArr;
 }
 
@@ -516,6 +551,7 @@ function showMove(num,type,color,str){
     findMoves(num,type,color,str);
     //console.log(pieces[num].moves);
     for (var mov=0;mov<pieces[num].moves.length;mov++){
+        console.log(pieces[num].moves[mov]);
         addBorder(pieces[num].moves[mov][1]);
         addDestinationFunction(num,pieces[num].moves[mov][1]);
         //console.log(pieces[num].moves[mov]);
@@ -527,9 +563,39 @@ function Destination(num1,num2){
     removeImages();
     console.log(num2);
     boardString = swapBoardString(boardString,num1,num2);
+    if (num1===60 && num2===62){
+        boardString = swapBoardString(boardString,63,61);
+        boardString = boardString.substring(0,boardString.length-1);
+        boardString += opposite(pieces[num1].color);
+    } else if (num1===60 && num2===58){
+        boardString = swapBoardString(boardString,56,59);
+        boardString = boardString.substring(0,boardString.length-1);
+        boardString += opposite(pieces[num1].color);
+    } else if (num1===4 && num2===6){
+        boardString = swapBoardString(boardString,7,5);
+        boardString = boardString.substring(0,boardString.length-1);
+        boardString += opposite(pieces[num1].color);
+    } else if (num1===4 && num2===2){
+        boardString = swapBoardString(boardString,0,3);
+        boardString = boardString.substring(0,boardString.length-1);
+        boardString += opposite(pieces[num1].color);
+    }
     board = newBoard(boardString);
     pieces = createPiecesArr(board);
     clearBorders();
+    if (num1===60){
+        canCastle.wKmoved = 1;
+    } else if (num1===4){
+        canCastle.bKmoved = 1;
+    } else if (num1===0){
+        canCastle.bRLmoved = 1;
+    } else if (num1===7){
+        canCastle.bRRmoved = 1;
+    } else if (num1===63){
+        canCastle.wRRmoved = 1;
+    } else if (num1===56){
+        canCastle.wRLmoved = 1;
+    }
     doThing();
 }
 
@@ -621,4 +687,12 @@ for (var pawnCountw=0;pawnCountw<8;pawnCountw++){
 }
 boardString += 'wRwNwBwQwKwBwNwRw';
 var board = newBoard(boardString);
+var canCastle = {
+    wKmoved : 0,
+    bKmoved : 0,
+    bRLmoved : 0,
+    bRRmoved : 0,
+    wRRmoved : 0,
+    wRLmoved : 0
+}
 var pieces = createPiecesArr(board);

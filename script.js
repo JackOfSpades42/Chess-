@@ -707,6 +707,16 @@ function doThing(){
             clearOnclick(boxes[cc]);
         }
     }
+    if (check(boardString,boardString[128])){
+        if (document.body.lastChild!==checkShowing){
+            document.body.append("Check!");
+            checkShowing = document.body.lastChild;
+        }
+    } else if (!check(boardString,boardString[128])){
+        if (document.body.lastChild===checkShowing){
+            document.body.removeChild(document.body.lastChild);
+        }
+    }
 }
 function removeImages(){
     var boxes = document.getElementsByClassName("box64");
@@ -748,4 +758,5 @@ var canCastle = {
     wRLmoved : 0
 }
 var lastmove = [];
+var checkShowing = "";
 var pieces = createPiecesArr(board);

@@ -113,7 +113,7 @@ function check (str,color){
         if (knightCheck.length>0){
             for (var kcheck=0;kcheck<knightCheck.length;kcheck++){
                 if (checkPieces[knightCheck[kcheck][1]]){
-                    if (checkPieces[knightCheck[kcheck][1]].type==="K"){
+                    if (checkPieces[knightCheck[kcheck][1]].type==="N"){
                         return true;
                     }
                 }
@@ -124,7 +124,8 @@ function check (str,color){
                 if (checkPieces[kingSpace-7].type==="P" && checkPieces[kingSpace-7].color==="b"){
                     return true;
                 }
-            } else if (checkPieces[kingSpace-9]){
+            }
+            if (checkPieces[kingSpace-9]){
                 if (checkPieces[kingSpace-9].type==="P" && checkPieces[kingSpace-9].color==="b"){
                     return true;
                 }
@@ -134,7 +135,8 @@ function check (str,color){
                 if (checkPieces[kingSpace+7].type==="P" && checkPieces[kingSpace+7].color==="w"){
                     return true;
                 }
-            } else if (checkPieces[kingSpace+9]){
+            }
+            if (checkPieces[kingSpace+9]){
                 if (checkPieces[kingSpace+9].type==="P" && checkPieces[kingSpace+9].color==="w"){
                     return true;
                 }
@@ -155,6 +157,31 @@ function checkmate(str){
         if (checkmatePieces[mateCheck]){
             if (checkmatePieces[mateCheck].color===colorMated){
                 var newMoves = findMoves(mateCheck,checkmatePieces[mateCheck].type,colorMated,str);
+                for (var addMoves=0;addMoves<newMoves.length;addMoves++){
+                    allMoves.push(newMoves[addMoves]);
+                    if (allMoves.length>0){
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    if (allMoves.length>0){
+        return false;
+    }
+    return true;
+}
+
+function stalemate(str){
+    console.log("stalemate");
+    var stalemateBoard = newBoard(str);
+    var stalematePieces = createPiecesArr(stalemateBoard);
+    var color = str[128];
+    var allMoves = [];
+    for (var mateCheck=0;mateCheck<stalematePieces.length;mateCheck++){
+        if (stalematePieces[mateCheck]){
+            if (stalematePieces[mateCheck].color===color){
+                var newMoves = findMoves(mateCheck,stalematePieces[mateCheck].type,color,str);
                 for (var addMoves=0;addMoves<newMoves.length;addMoves++){
                     allMoves.push(newMoves[addMoves]);
                     if (allMoves.length>0){
@@ -885,6 +912,10 @@ function doThing(){
         document.body.append("Checkmate!");
         alert("Game Over!");
     }
+    if (stalemate(boardString)){
+        alert("Stalemate!");
+        document.body.append("Stalemate!");
+    }
 }
 function removeImages(){
     var boxes = document.getElementsByClassName("box64");
@@ -905,6 +936,7 @@ function removeImages(){
 */
 //The goods
 var boardString = 'bRbNbBbQbKbBbNbR'
+//var boardString = "";
 for (var pawnCountb=0;pawnCountb<8;pawnCountb++){
     boardString += 'bP';
 }
@@ -916,6 +948,15 @@ for (var pawnCountw=0;pawnCountw<8;pawnCountw++){
     
 }
 boardString += 'wRwNwBwQwKwBwNwRw';
+/*
+for(var staleString=0;staleString<7;staleString++){
+    boardString += "ee"
+}
+boardString+= "wRbKeeeeeeeeeeeeeewBeeeeeeeeeeeeeewBwPeeeeeeeeeeeeeeeeeewPwK";
+for (var thisString=boardString.length;thisString<128;thisString++){
+    boardString+="ee";
+}
+boardString +='w';*/
 var board = newBoard(boardString);
 var canCastle = {
     wKmoved : 0,

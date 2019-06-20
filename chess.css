@@ -1,7 +1,7 @@
 table{
     border-spacing: 0;
 }
-td{
+.outerborder td{
     height: 40px;
     width: 80px;
     box-sizing: border-box;
@@ -108,4 +108,7 @@ img{
 img::before{
     position: absolute;
     pointer-events: none;
+}
+#scoresheet{
+    margin-top: 50px;
 }

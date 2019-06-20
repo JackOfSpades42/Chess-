@@ -12,8 +12,10 @@ function addSelectionBorder(num){
     if (check(boardString,boardString[128]) && kingspace!==num){
         boxes[kingspace].style.border = "2px solid rgb(128,0,0)";
     }
-    boxes[lastmove[0]].style.border = "2px solid green";
-    boxes[lastmove[1]].style.border = "2px solid green";
+    if (lastmove.length>0){
+        boxes[lastmove[0]].style.border = "2px solid green";
+        boxes[lastmove[1]].style.border = "2px solid green";
+    }
 }
 
 function clearBorders(){
@@ -44,6 +46,15 @@ function opposite(color){
         return "b";
     }
     return "w";
+}
+
+function findFile(num){
+    returnArr = ["a","b","c","d","e","f","g","h"];
+    return returnArr[num];
+}
+
+function findRank(num){
+    return 8 - num;
 }
 
 function createPiecesArr(board){
@@ -157,8 +168,8 @@ function checkmate(str){
     var checkmatePieces = createPiecesArr(checkmateBoard);
     var colorMated = str[128];
     var allMoves = [];
-    console.log(str);
-    console.log(checkmatePieces);
+    //console.log(str);
+    //console.log(checkmatePieces);
     for (var mateCheck=0;mateCheck<checkmatePieces.length;mateCheck++){
         if (checkmatePieces[mateCheck]){
             if (checkmatePieces[mateCheck].color===colorMated){
@@ -179,7 +190,7 @@ function checkmate(str){
 }
 
 function stalemate(str){
-    console.log("stalemate");
+    //console.log("stalemate");
     var stalemateBoard = newBoard(str);
     var stalematePieces = createPiecesArr(stalemateBoard);
     var color = str[128];
@@ -773,18 +784,60 @@ function showMove(num,type,color,str){
     console.log(num + " " + color + type);
     pieces[num].moves = findMoves(num,type,color,str);
     //console.log(pieces[num].moves);
+    addSelectionBorder(num);
     for (var mov=0;mov<pieces[num].moves.length;mov++){
         console.log(pieces[num].moves[mov]);
         addBorder(pieces[num].moves[mov][1]);
         addDestinationFunction(num,pieces[num].moves[mov][1],str);
         //console.log(pieces[num].moves[mov]);
     }
-    addSelectionBorder(num);
+    
+}
+
+function displayMove(num1,num2,str){
+    var innerString = pieces[num1].type;
+    var scoresheet = document.getElementById("scoresheet");
+    console.log(scoresheet);
+    if (pieces[num2]){
+        innerString += "x";
+    }
+    innerString += findFile(num2%8);
+    innerString += findRank(Math.floor(num2/8));
+    if (pieces[num1].type==="P"){
+        innerString = innerString.substring(1,innerString.length);
+        if (innerString[0]==="x"){
+            innerString = findFile(num1%8) + innerString;
+        }
+    }
+    var newStr = swapBoardString(str,num1,num2);
+    if (((num1===60 && num2===62) || (num1===4 && num2===6)) && pieces[num1].type==="K"){
+        innerString = "O-O";
+    } else if (((num1===60 && num2===58) || (num1===4 && num2===2)) && pieces[num1].type==="K"){
+        innerString = "O-O-O";
+    }
+    
+    if (checkmate(newStr)){
+        innerString += "#";
+    } else  if (check(newStr,newStr[128])){
+        innerString += "+";
+    }
+    console.log(scoresheet.rows[scoresheet.rows.length-1].cells);
+    if (scoresheet.rows[scoresheet.rows.length-1].cells.length===3){
+        var newRow = scoresheet.insertRow();
+        var turnCell = newRow.insertCell();
+        turnCell.innerHTML = scoresheet.rows.length + ".";
+        var newCell = newRow.insertCell();
+        newCell.innerHTML = innerString;
+    } else {
+        var newCell = scoresheet.rows[scoresheet.rows.length-1].insertCell();
+        newCell.innerHTML = innerString;
+    }
 }
 
 function Destination(num1,num2,str){
     removeImages();
     console.log(num2);
+    displayMove(num1,num2,str);
     boardString = swapBoardString(boardString,num1,num2);
     if (num1===60 && num2===62){
         boardString = swapBoardString(boardString,63,61);
@@ -923,7 +976,7 @@ function doThing(){
         document.body.append("Checkmate!");
         alert("Game Over!");
     }
-    if (stalemate(boardString)){
+    else if (stalemate(boardString)){
         alert("Stalemate!");
         document.body.append("Stalemate!");
     }
@@ -936,6 +989,7 @@ function removeImages(){
         }
     }
 }
+
 /*
 *
 *

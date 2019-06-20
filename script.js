@@ -68,7 +68,6 @@ function createPiecesArr(board){
 }
 
 function swapBoardString(str,numFrom,numTo){
-        //console.log("moving " + numFrom + " to " + numTo);
         if (numFrom<numTo){
             newString = str.substring(0,numFrom*2);
             newString += "ee";
@@ -102,8 +101,6 @@ function check (str,color){
     else {
         var king = color + "K";
         var kingSpace = Math.floor((str.indexOf(king)/2));
-        //console.log(kingSpace);
-       //console.log("Check string = "+ str );
         var bishCheck = getBishopMoves(kingSpace,color,str,function(str,num){return false});
         var rookCheck = getRookMoves(kingSpace,color,str,function(str,num){return false});
         var knightCheck = getKnightMoves(kingSpace,color,str,function(str,num){return false});
@@ -178,8 +175,6 @@ function checkmate(str){
     var checkmatePieces = createPiecesArr(checkmateBoard);
     var colorMated = str[128];
     var allMoves = [];
-    //console.log(str);
-    //console.log(checkmatePieces);
     for (var mateCheck=0;mateCheck<checkmatePieces.length;mateCheck++){
         if (checkmatePieces[mateCheck]){
             if (checkmatePieces[mateCheck].color===colorMated){
@@ -203,7 +198,6 @@ function checkmate(str){
 }
 
 function stalemate(str){
-    //console.log("stalemate");
     var stalemateBoard = newBoard(str);
     var stalematePieces = createPiecesArr(stalemateBoard);
     var color = str[128];
@@ -228,29 +222,24 @@ function stalemate(str){
 }
 
 function promote(str){
-    console.log(str);
     promoteBoard = newBoard(str);
     promotePieces = createPiecesArr(promoteBoard);
     for (var firstCheck=0;firstCheck<8;firstCheck++){
         if (promotePieces[firstCheck]){
-            console.log("first row");
             if (promotePieces[firstCheck].type==="P"){
                 var newStr = str.substring(0,firstCheck*2);
                 newStr += "wQ";
                 newStr += str.substring(firstCheck*2+2,str.length);
-                console.log(newStr);
                 return newStr; 
             }
         }
     }
     for (var secondCheck=56;secondCheck<64;secondCheck++){
         if (promotePieces[secondCheck]){
-            console.log("lastrow");
             if (promotePieces[secondCheck].type==="P"){
                 var newStr = str.substring(0,secondCheck*2);
                 newStr += "bQ";
                 newStr += str.substring(secondCheck*2+2,str.length);
-                console.log(newStr);
                 return newStr;
             }
         }
@@ -515,9 +504,6 @@ function getKingMoves(num,color,str,func){
             if (!pieces[61] && !pieces[62] && !func(str,"w")){
                 var checkString = swapBoardString(str,num,61);
                 var checkString2 = swapBoardString(str,num,62);
-                if (func(checkString2,"w")){
-                    console.log(checkString2);
-                }
                 if (!func(checkString,"w") && !func(checkString2,"w")){
                     movesArr.push([num,62]);
                 }
@@ -799,13 +785,11 @@ function showMove(num,type,color,str){
     clearBorders();
     console.log(num + " " + color + type);
     pieces[num].moves = findMoves(num,type,color,str);
-    //console.log(pieces[num].moves);
     addSelectionBorder(num);
     for (var mov=0;mov<pieces[num].moves.length;mov++){
         console.log(pieces[num].moves[mov]);
         addBorder(pieces[num].moves[mov][1]);
         addDestinationFunction(num,pieces[num].moves[mov][1],str);
-        //console.log(pieces[num].moves[mov]);
     }
     
 }
@@ -813,7 +797,6 @@ function showMove(num,type,color,str){
 function displayMove(num1,num2,str){
     var innerString = pieces[num1].type;
     var scoresheet = document.getElementById("scoresheet");
-    console.log(scoresheet);
     if (pieces[num2]){
         innerString += "x";
     }
@@ -837,7 +820,6 @@ function displayMove(num1,num2,str){
     } else  if (check(newStr,newStr[128])){
         innerString += "+";
     }
-    console.log(scoresheet.rows[scoresheet.rows.length-1].cells);
     if (scoresheet.rows[scoresheet.rows.length-1].cells.length===3){
         var newRow = scoresheet.insertRow();
         var turnCell = newRow.insertCell();

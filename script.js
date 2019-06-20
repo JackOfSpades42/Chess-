@@ -163,7 +163,7 @@ function check (str,color){
         if (kingCheck.length>0){
             for (var kingc=0;kingc<kingCheck.length;kingc++){
                 if (checkPieces[kingCheck[kingc][1]]){
-                    if (checkPieces[kingCheck[kingc][1]].type==="K"){
+                    if (checkPieces[kingCheck[kingc][1]].type==="K" && checkPieces[kingCheck[kingc][1].color === opposite(color)]){
                         return true;
                     }
                 }
@@ -515,6 +515,9 @@ function getKingMoves(num,color,str,func){
             if (!pieces[61] && !pieces[62] && !func(str,"w")){
                 var checkString = swapBoardString(str,num,61);
                 var checkString2 = swapBoardString(str,num,62);
+                if (func(checkString2,"w")){
+                    console.log(checkString2);
+                }
                 if (!func(checkString,"w") && !func(checkString2,"w")){
                     movesArr.push([num,62]);
                 }

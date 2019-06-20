@@ -171,6 +171,9 @@ function check (str,color){
 }
 
 function checkmate(str){
+    if (gameover!==""){
+        return true;
+    }
     var checkmateBoard = newBoard(str);
     var checkmatePieces = createPiecesArr(checkmateBoard);
     var colorMated = str[128];
@@ -826,11 +829,38 @@ function displayMove(num1,num2,str){
         turnCell.innerHTML = scoresheet.rows.length + ".";
         var newCell = newRow.insertCell();
         newCell.style.width = "50px";
-        newCell.innerHTML = innerString;
+        var newBtn = document.createElement("button");
+        newBtn.onclick = function (){goBackTo(newStr);}
+        newBtn.innerHTML = innerString;
+        newBtn.classList = "previousMoves";
+        newCell.append(newBtn);
     } else {
         var newCell = scoresheet.rows[scoresheet.rows.length-1].insertCell();
         newCell.style.width = "50px";
-        newCell.innerHTML = innerString;
+        var newBtn = document.createElement("button");
+        newBtn.onclick = function (){goBackTo(newStr);}
+        newBtn.innerHTML = innerString;
+        newBtn.classList = "previousMoves";
+        newCell.append(newBtn);
+    }
+}
+
+function goBackTo(str){
+    removeImages();
+    clearBorders();
+    if (str===boardString){
+        doThing();
+    } else {
+        var backBoard = newBoard(str);
+        var backPieces = createPiecesArr(backBoard);
+        var boxes = document.getElementsByClassName("box64");
+        for (var backshow=0;backshow<backPieces.length;backshow++){
+            if (backPieces[backshow]){
+                boxes[backshow].append(backPieces[backshow].image);
+            }
+            clearOnclick(boxes[backshow]);
+            boxes[backshow].style.cursor = "default";
+        }
     }
 }
 
@@ -989,8 +1019,11 @@ function doThing(){
             document.body.removeChild(document.body.lastChild);
         }
     } else if (checkmate(boardString)){
-        document.body.append("Checkmate!");
-        alert("Game Over!");
+        if (document.body.lastChild!==gameover){
+            document.body.append("Checkmate!");
+            alert("Game Over!");
+            gameover = document.body.lastChild;
+        }
     }
     else if (stalemate(boardString)){
         alert("Stalemate!");
@@ -1000,7 +1033,8 @@ function doThing(){
 function removeImages(){
     var boxes = document.getElementsByClassName("box64");
     for (var dd=0;dd<64;dd++){
-        if (pieces[dd]){
+        //console.log("type for box" + dd + "= " + boxes[dd].lastChild.nodeType);
+        if (boxes[dd].lastChild.nodeType===1){
             boxes[dd].removeChild(boxes[dd].lastChild);
         }
     }
@@ -1049,4 +1083,5 @@ var canCastle = {
 }
 var lastmove = [];
 var checkShowing = "";
+var gameover = "";
 var pieces = createPiecesArr(board);

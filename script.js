@@ -107,6 +107,7 @@ function check (str,color){
         var bishCheck = getBishopMoves(kingSpace,color,str,function(str,num){return false});
         var rookCheck = getRookMoves(kingSpace,color,str,function(str,num){return false});
         var knightCheck = getKnightMoves(kingSpace,color,str,function(str,num){return false});
+        var kingCheck = getKingMoves(kingSpace,color,str,function(str,num){return false});
         var checkBoard = newBoard(str);
         var checkPieces = createPiecesArr(checkBoard);
         if (bishCheck.length>0){
@@ -159,6 +160,15 @@ function check (str,color){
                 }
             }
         }
+        if (kingCheck.length>0){
+            for (var kingc=0;kingc<kingCheck.length;kingc++){
+                if (checkPieces[kingCheck[kingc][1]]){
+                    if (checkPieces[kingCheck[kingc][1]].type==="K"){
+                        return true;
+                    }
+                }
+            }
+        }
     }
     return false;
 }
@@ -184,6 +194,9 @@ function checkmate(str){
         }
     }
     if (allMoves.length>0){
+        return false;
+    }
+    if (!check(str,str[128])){
         return false;
     }
     return true;
@@ -403,12 +416,12 @@ function getRookMoves(num,color,str,func){
 
 
 
-function getKingMoves(num,color,str){
+function getKingMoves(num,color,str,func){
     var movesArr = [];
     if(num+1<64){
         if (num+8<64){
             var checkString = swapBoardString(str,num,num+8);
-            if (!check(checkString,color)){
+            if (!func(checkString,color)){
                 if (!pieces[num+8]){
                     movesArr.push([num,num+8]);
                 } else if (pieces[num+8].color===opposite(color)){
@@ -418,7 +431,7 @@ function getKingMoves(num,color,str){
         } 
         if (num+7<64){
             var checkString = swapBoardString(str,num,num+7);
-            if (!check(checkString,color)){
+            if (!func(checkString,color)){
                 if (!pieces[num+7] && num%8!==0){
                     movesArr.push([num,num+7]);
                 } else if(!pieces[num+7]){
@@ -430,7 +443,7 @@ function getKingMoves(num,color,str){
         }
         if (num+9<64){
             var checkString = swapBoardString(str,num,num+9);
-            if (!check(checkString,color)){
+            if (!func(checkString,color)){
                 if (!pieces[num+9] && num%8!==7){
                     movesArr.push([num,num+9]);
                 } else if(!pieces[num+9]){
@@ -441,7 +454,7 @@ function getKingMoves(num,color,str){
             }
         }
         var checkString = swapBoardString(str,num,num+1);
-        if (!check(checkString,color)){
+        if (!func(checkString,color)){
             if (!pieces[num+1] & num%8!==7){
                 movesArr.push([num,num+1]);
             } else if(!pieces[num+1]){
@@ -454,7 +467,7 @@ function getKingMoves(num,color,str){
     if (num-1>=0){
         if (num-8>=0){
             var checkString = swapBoardString(str,num,num-8);
-            if (!check(checkString,color)){
+            if (!func(checkString,color)){
                 if (!pieces[num-8]){
                     movesArr.push([num,num-8]);
                 } else if (pieces[num-8].color===opposite(color)){
@@ -464,7 +477,7 @@ function getKingMoves(num,color,str){
         } 
         if (num-7>=0){
             var checkString = swapBoardString(str,num,num-7);
-            if (!check(checkString,color)){
+            if (!func(checkString,color)){
                 if (!pieces[num-7] && num%8!==7){
                     movesArr.push([num,num-7]);
                 } else if(!pieces[num-7]){
@@ -476,7 +489,7 @@ function getKingMoves(num,color,str){
         }
         if (num-9>=0){
             var checkString = swapBoardString(str,num,num-9);
-            if (!check(checkString,color)){
+            if (!func(checkString,color)){
                 if (!pieces[num-9] && num%8!==0){
                     movesArr.push([num,num-9]);
                 } else if(!pieces[num-9]){
@@ -487,7 +500,7 @@ function getKingMoves(num,color,str){
             }
         }
         var checkString = swapBoardString(str,num,num-1);
-        if (!check(checkString,color)){
+        if (!func(checkString,color)){
             if (!pieces[num-1] && num%8!==0){
                 movesArr.push([num,num-1]);
             } else if(!pieces[num-1]){
@@ -499,19 +512,19 @@ function getKingMoves(num,color,str){
     }
     if (color==="w"){
         if (!canCastle.wKmoved && !canCastle.wRRmoved){
-            if (!pieces[61] && !pieces[62] && !check(str,"w")){
+            if (!pieces[61] && !pieces[62] && !func(str,"w")){
                 var checkString = swapBoardString(str,num,61);
                 var checkString2 = swapBoardString(str,num,62);
-                if (!check(checkString,"w") && !check(checkString2,"w")){
+                if (!func(checkString,"w") && !func(checkString2,"w")){
                     movesArr.push([num,62]);
                 }
             }
         }
         if (!canCastle.wKmoved && !canCastle.wRLmoved){
-            if (!pieces[59] && !pieces[58] && !check(str,"w")){
+            if (!pieces[59] && !pieces[58] && !func(str,"w")){
                 var checkString = swapBoardString(str,num,58);
                 var checkString2 = swapBoardString(str,num,59);
-                if (!check(checkString,"w") && !check(checkString2,"w")){
+                if (!func(checkString,"w") && !func(checkString2,"w")){
                     movesArr.push([num,58]);
                 }
             }
@@ -519,19 +532,19 @@ function getKingMoves(num,color,str){
     }
     if (color==="b"){
         if (!canCastle.bKmoved && !canCastle.bRRmoved){
-            if (!pieces[5] && !pieces[6] && !check(str,"b")){
+            if (!pieces[5] && !pieces[6] && !func(str,"b")){
                 var checkString = swapBoardString(str,num,5);
                 var checkString2 = swapBoardString(str,num,6);
-                if (!check(checkString,"b") && !check(checkString2,"b")){
+                if (!func(checkString,"b") && !func(checkString2,"b")){
                     movesArr.push([num,6]);
                 }
             }
         }
         if (!canCastle.bKmoved && !canCastle.bRLmoved){
-            if (!pieces[3] && !pieces[2] && !check(str,"b")){
+            if (!pieces[3] && !pieces[2] && !func(str,"b")){
                 var checkString = swapBoardString(str,num,3);
                 var checkString2 = swapBoardString(str,num,2);
-                if (!check(checkString,"b") && !check(checkString2,"b")){
+                if (!func(checkString,"b") && !func(checkString2,"b")){
                     movesArr.push([num,2]);
                 }
             }
@@ -769,7 +782,7 @@ function findMoves(num,type,color,str){
             moveArr.push(qRookMoves[addRookMoves]);
         }
     } else if (type==="K"){
-        moveArr = getKingMoves(num,color,str);
+        moveArr = getKingMoves(num,color,str,check);
     }
     return moveArr;
 }
@@ -827,17 +840,35 @@ function displayMove(num1,num2,str){
         var turnCell = newRow.insertCell();
         turnCell.innerHTML = scoresheet.rows.length + ".";
         var newCell = newRow.insertCell();
+        newCell.style.width = "50px";
         newCell.innerHTML = innerString;
     } else {
         var newCell = scoresheet.rows[scoresheet.rows.length-1].insertCell();
+        newCell.style.width = "50px";
         newCell.innerHTML = innerString;
     }
+}
+
+function displayCapturedPiece(piece){
+    var graveyard;
+    if (piece.color==="w"){
+        graveyard = document.getElementById("takenwhite");
+    } else {
+        graveyard = document.getElementById("takenblack");
+    }
+    var smallImg = new Image(40,40);
+    smallImg.src = "./img/" + piece.color + piece.type + ".png";
+    smallImg.style = "margin-top:0";
+    graveyard.append(smallImg);
 }
 
 function Destination(num1,num2,str){
     removeImages();
     console.log(num2);
     displayMove(num1,num2,str);
+    if (pieces[num2]){
+        displayCapturedPiece(pieces[num2]);
+    }
     boardString = swapBoardString(boardString,num1,num2);
     if (num1===60 && num2===62){
         boardString = swapBoardString(boardString,63,61);
@@ -968,7 +999,7 @@ function doThing(){
         }
         var kingspace = boardString.indexOf(boardString[128] + "K");
         boxes[kingspace/2].style.border = "2px solid rgb(128,0,0)";
-    } else if (!check(boardString,boardString[128])){
+    } else if (!check(boardString,boardString[128]) && !stalemate(boardString)){
         if (document.body.lastChild===checkShowing){
             document.body.removeChild(document.body.lastChild);
         }

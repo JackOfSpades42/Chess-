@@ -7,8 +7,8 @@
 <!--highlight : style="border:2px solid rgb(236, 253, 116)"-->
 <body onload="doThing()">
     <table id="check">
-        <tr>
-            <td>
+        <tr style="max-height: 650px;">
+            <td style="vertical-align: top">
     <table class="outerborder">
         <tr>
             <!--whitebox-->
@@ -1481,14 +1481,22 @@
 
     </table>
 </td>
-<td style="vertical-align: top">
+<td class="scoresheetbox">
+    <div style="height: 675px; overflow: scroll">
     <table id ="scoresheet">
         <tr>
         <td>1.</td>
         </tr>
     </table>
+    </div>
     </td>
 </tr>
+    </table>
+    <table style="width: 644px">
+        <tr style="width:100%">
+            <td style="width: 50%" id="takenwhite"></td>
+            <td style="text-align: right" id="takenblack"></td>
+        </tr>
     </table>
     <!--<button onclick="doThing()">Do Thing</button>-->
     <!--<div style="font-size: 16pt">

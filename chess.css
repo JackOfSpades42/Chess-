@@ -110,5 +110,9 @@ img::before{
     pointer-events: none;
 }
 #scoresheet{
-    margin-top: 50px;
+    margin-top: 25px;
+}
+.scoresheetbox{
+    vertical-align: top;
+    width: 128px;
 }

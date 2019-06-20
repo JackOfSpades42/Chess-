@@ -8,6 +8,12 @@ function addBorder(num){
 function addSelectionBorder(num){
     var boxes = document.getElementsByClassName("box64");
     boxes[num].style.border = "2px solid rgb(1,1,1)";
+    var kingspace = boardString.indexOf(boardString[128] + "K")/2;
+    if (check(boardString,boardString[128]) && kingspace!==num){
+        boxes[kingspace].style.border = "2px solid rgb(128,0,0)";
+    }
+    boxes[lastmove[0]].style.border = "2px solid green";
+    boxes[lastmove[1]].style.border = "2px solid green";
 }
 
 function clearBorders(){
@@ -840,6 +846,9 @@ function Destination(num1,num2,str){
         canCastle.wRLmoved = 1;
     }
     lastmove = [num1,num2];
+    var boxes = document.getElementsByClassName("box64");
+    boxes[num1].style.border = "2px solid green";
+    boxes[num2].style.border = "2px solid green";
     doThing();
 }
 
@@ -904,6 +913,8 @@ function doThing(){
             document.body.append("Check!");
             checkShowing = document.body.lastChild;
         }
+        var kingspace = boardString.indexOf(boardString[128] + "K");
+        boxes[kingspace/2].style.border = "2px solid rgb(128,0,0)";
     } else if (!check(boardString,boardString[128])){
         if (document.body.lastChild===checkShowing){
             document.body.removeChild(document.body.lastChild);

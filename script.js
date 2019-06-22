@@ -230,16 +230,41 @@ function stalemate(str){
     return true;
 }
 
+function getPromotePiece(str){
+    var promoteBox = document.getElementsByClassName("promoteBox");
+    promoteBox[0].style.display = "block";
+    var promoteButton = document.getElementById("promoteButton");
+    promoteButton.onclick = function(){promote(str)};
+}
+
 function promote(str){
+    var promotedTo = document.getElementsByName("promo");
+    for (var findPiece=0;findPiece<4;findPiece++){
+        if (promotedTo[findPiece].checked){
+            promotedTo = promotedTo[findPiece].value;
+            var promoteBox = document.getElementsByClassName("promoteBox");
+            promoteBox[0].style.display = "none";
+            break;
+        }
+        if (findPiece===3 && !promotedTo[findPiece].checked){
+            return;
+        }
+    }
     promoteBoard = newBoard(str);
     promotePieces = createPiecesArr(promoteBoard);
     for (var firstCheck=0;firstCheck<8;firstCheck++){
         if (promotePieces[firstCheck]){
             if (promotePieces[firstCheck].type==="P"){
                 var newStr = str.substring(0,firstCheck*2);
-                newStr += "wQ";
+                newStr += "w" + promotedTo;
+                console.log("str=" + newStr.substring(firstCheck*2,firstCheck*2+2));
                 newStr += str.substring(firstCheck*2+2,str.length);
-                return newStr; 
+                boardString = newStr;
+                promoteBoard=newBoard(newStr);
+                promotePieces = createPiecesArr(promoteBoard);
+                pieces = promotePieces;
+                removeImages();
+                doThing();
             }
         }
     }
@@ -247,9 +272,14 @@ function promote(str){
         if (promotePieces[secondCheck]){
             if (promotePieces[secondCheck].type==="P"){
                 var newStr = str.substring(0,secondCheck*2);
-                newStr += "bQ";
+                newStr += "b" + promotedTo;
                 newStr += str.substring(secondCheck*2+2,str.length);
-                return newStr;
+                boardString = newStr;
+                promoteBoard=newBoard(newStr);
+                promotePieces = createPiecesArr(promoteBoard);
+                pieces = promotePieces;
+                removeImages();
+                doThing();
             }
         }
     }
@@ -931,7 +961,7 @@ function Destination(num1,num2,str){
             boardString = newString;
         }
         if (Math.floor(num2/8)===0 || Math.floor(num2/8)===7){
-            boardString = promote(boardString);
+            getPromotePiece(boardString);
         }
     }
     board = newBoard(boardString);

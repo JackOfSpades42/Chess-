@@ -116,3 +116,13 @@ img::before{
     vertical-align: top;
     width: 128px;
 }
+.promoteBox{
+    position: absolute;
+    margin-left: 250px;
+    margin-top: -475px;
+    border: 2px solid black;
+    background: chocolate;
+    text-align: center;
+    padding: 2px;
+    padding-bottom: 4px;
+}

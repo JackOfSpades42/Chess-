@@ -263,6 +263,8 @@ function promote(str){
                 promoteBoard=newBoard(newStr);
                 promotePieces = createPiecesArr(promoteBoard);
                 pieces = promotePieces;
+                var previousMoves = document.getElementsByClassName("previousMoves");
+                previousMoves[previousMoves.length-1].onclick = function(){goBackTo(newStr)};
                 removeImages();
                 doThing();
             }
@@ -278,6 +280,8 @@ function promote(str){
                 promoteBoard=newBoard(newStr);
                 promotePieces = createPiecesArr(promoteBoard);
                 pieces = promotePieces;
+                var previousMoves = document.getElementsByClassName("previousMoves");
+                previousMoves[previousMoves.length-1].onclick = function(){goBackTo(newStr)};
                 removeImages();
                 doThing();
             }

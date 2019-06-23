@@ -137,12 +137,12 @@ function check (str,color){
         var kingCheckArr = [-1,1,8,-8,7,-7,9,-9];
         if (color==="w"){
             if (checkPieces[kingSpace-7]){
-                if (checkPieces[kingSpace-7].type==="P" && checkPieces[kingSpace-7].color==="b"){
+                if (checkPieces[kingSpace-7].type==="P" && checkPieces[kingSpace-7].color==="b" && (kingSpace-7)%8!==0){
                     return true;
                 }
             }
             if (checkPieces[kingSpace-9]){
-                if (checkPieces[kingSpace-9].type==="P" && checkPieces[kingSpace-9].color==="b"){
+                if (checkPieces[kingSpace-9].type==="P" && checkPieces[kingSpace-9].color==="b" && (kingSpace-9)%8!==7){
                     return true;
                 }
             }
@@ -155,12 +155,12 @@ function check (str,color){
             }
         } else {
             if (checkPieces[kingSpace+7]){
-                if (checkPieces[kingSpace+7].type==="P" && checkPieces[kingSpace+7].color==="w"){
+                if (checkPieces[kingSpace+7].type==="P" && checkPieces[kingSpace+7].color==="w" && (kingSpace+7)%8!==7) {
                     return true;
                 }
             }
             if (checkPieces[kingSpace+9]){
-                if (checkPieces[kingSpace+9].type==="P" && checkPieces[kingSpace+9].color==="w"){
+                if (checkPieces[kingSpace+9].type==="P" && checkPieces[kingSpace+9].color==="w" && (kingSpace+9)%8!==0){
                     return true;
                 }
             }

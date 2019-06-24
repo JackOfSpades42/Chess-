@@ -188,11 +188,8 @@ function checkmate(str){
         if (checkmatePieces[mateCheck]){
             if (checkmatePieces[mateCheck].color===colorMated){
                 var newMoves = findMoves(mateCheck,checkmatePieces[mateCheck].type,colorMated,str);
-                for (var addMoves=0;addMoves<newMoves.length;addMoves++){
-                    allMoves.push(newMoves[addMoves]);
-                    if (allMoves.length>0){
-                        return false;
-                    }
+                if (newMoves.length>0){
+                    return false;
                 }
             }
         }
@@ -215,11 +212,8 @@ function stalemate(str){
         if (stalematePieces[mateCheck]){
             if (stalematePieces[mateCheck].color===color){
                 var newMoves = findMoves(mateCheck,stalematePieces[mateCheck].type,color,str);
-                for (var addMoves=0;addMoves<newMoves.length;addMoves++){
-                    allMoves.push(newMoves[addMoves]);
-                    if (allMoves.length>0){
-                        return false;
-                    }
+                if (newMoves.length>0){
+                    return false;
                 }
             }
         }
@@ -257,7 +251,6 @@ function promote(str){
             if (promotePieces[firstCheck].type==="P"){
                 var newStr = str.substring(0,firstCheck*2);
                 newStr += "w" + promotedTo;
-                console.log("str=" + newStr.substring(firstCheck*2,firstCheck*2+2));
                 newStr += str.substring(firstCheck*2+2,str.length);
                 boardString = newStr;
                 promoteBoard=newBoard(newStr);
@@ -826,11 +819,9 @@ function showMove(num,type,color,str){
     doThing();
     pieces[num].moves = [];
     clearBorders();
-    console.log(num + " " + color + type);
     pieces[num].moves = findMoves(num,type,color,str);
     addSelectionBorder(num);
     for (var mov=0;mov<pieces[num].moves.length;mov++){
-        console.log(pieces[num].moves[mov]);
         addBorder(pieces[num].moves[mov][1]);
         addDestinationFunction(num,pieces[num].moves[mov][1],str);
     }
@@ -857,11 +848,12 @@ function displayMove(num1,num2,str){
     } else if (((num1===60 && num2===58) || (num1===4 && num2===2)) && pieces[num1].type==="K"){
         innerString = "O-O-O";
     }
-    
-    if (checkmate(newStr)){
-        innerString += "#";
-    } else  if (check(newStr,newStr[128])){
-        innerString += "+";
+    if (check(newStr,newStr[128])){
+        if (checkmate(newStr)){
+            innerString += "#";
+        } else {
+            innerString += "+";
+        }
     }
     if (scoresheet.rows[scoresheet.rows.length-1].cells.length===3){
         var newRow = scoresheet.insertRow();
@@ -919,7 +911,7 @@ function displayCapturedPiece(piece){
 
 function Destination(num1,num2,str){
     removeImages();
-    console.log(num2);
+    //console.log(num2);
     displayMove(num1,num2,str);
     if (pieces[num2]){
         displayCapturedPiece(pieces[num2]);
@@ -1038,7 +1030,7 @@ function doThing(){
         if (pieces[cc]){
             boxes[cc].append(pieces[cc].image);
             pieces[cc].space = cc;
-            if (pieces[cc].color!==boardString[128]){
+            if (pieces[cc].color!==playerColor){
                 clearOnclick(boxes[cc]);
             } else {
                 addShowMoveFunction(boxes[cc],cc,pieces[cc].type,pieces[cc].color,boardString);
@@ -1069,11 +1061,16 @@ function doThing(){
         alert("Stalemate!");
         document.body.append("Stalemate!");
     }
+    if (boardString[128]===compColor){
+        doCompMove(boardString)
+    }
+}
+function doCompMove(str){
+    getCompMove(str);
 }
 function removeImages(){
     var boxes = document.getElementsByClassName("box64");
     for (var dd=0;dd<64;dd++){
-        //console.log("type for box" + dd + "= " + boxes[dd].lastChild.nodeType);
         if (boxes[dd].lastChild.nodeType===1){
             boxes[dd].removeChild(boxes[dd].lastChild);
         }
@@ -1090,6 +1087,185 @@ function removeImages(){
 *
 */
 //The goods
+var playerColor = "w";
+var compColor = "b";
+function pieceScore(type){
+    if (type==="P"){
+        return 1;
+    } else if (type==="Q"){
+        return 9;
+    } else if (type==="N"){
+        return 3;
+    } else if (type==="B"){
+        return 3;
+    } else if (type==="R"){
+        return 5;
+    } else if (type==="K"){
+        return 0;
+    }
+}
+
+function getScore(str){
+    scoreBoard = newBoard(str);
+    scorePieces = createPiecesArr(scoreBoard);
+    var score = 0;
+    var compObj  = {
+        B: 0,
+        N: 0,
+        R: 0
+    };
+    var playerObj = {
+        B:0,
+        N:0,
+        R:0
+    }
+    if (checkmate(str)){
+        if (str[128]===playerColor){
+            return 9001;
+        } else if (str[128]===compColor){
+            return -9001;
+        }
+    } else if (stalemate(str)){
+        return -9000;
+    }
+    for (var scoring=0;scoring<scorePieces.length;scoring++){
+        if (scorePieces[scoring]){
+            var thisPiece = scorePieces[scoring];
+            if (thisPiece.color===compColor){
+                score += pieceScore(thisPiece.type);
+                if (thisPiece.type==="N"){
+                    compObj.N += 1;
+                } else if (thisPiece.type==="B"){
+                    compObj.B += 1;
+                } else if (thisPiece.type==="R"){
+                    compObj.R += 1;
+                }
+            } else if (thisPiece.color===playerColor){
+                score -= pieceScore(thisPiece.type);
+                if (thisPiece.type==="N"){
+                    playerObj.N += 1;
+                } else if (thisPiece.type==="B"){
+                    playerObj.B += 1;
+                } else if (thisPiece.type==="R"){
+                    playerObj.R += 1;
+                }
+            }
+        }
+    }
+    if (compObj.B>1){
+        score += 1;
+    }
+    if (compObj.N>1){
+        score += 0.5;
+    }
+    if (compObj.R>1){
+        score += 1;
+    }
+    if (playerObj.N>1){
+        score -= 0.5;
+    }
+    if (playerObj.B>1){
+        score -= 1;
+    }
+    if (playerObj.R>1){
+        score -= 1;
+    }
+    //console.log(score);
+    return score;
+}
+
+function getAllMoves(str){
+    var movesBoard = newBoard(str);
+    var movesPieces = createPiecesArr(movesBoard);
+    var allMoves = [];
+    for (var movesc=0;movesc<movesPieces.length;movesc++){
+        if (movesPieces[movesc]){
+            var thisPiece = movesPieces[movesc];
+            if (thisPiece.color===str[128]){
+                thisPiece.moves = findMoves(movesc,thisPiece.type,thisPiece.color,str);
+                for (var pushc=0;pushc<thisPiece.moves.length;pushc++){
+                    allMoves.push(thisPiece.moves[pushc]);
+                }
+            }
+        }
+    }
+    return allMoves;
+}
+var count=0;
+function getBoardObjFromString(str,moveFunc){
+    var boardObj = {
+        string:str,
+        color: str[128]
+    }
+    boardObj.movesArr = moveFunc(str);
+    boardObj.moveStrings = [];
+    boardObj.possibleNextBoards = [];
+    boardObj.scores = [];
+    //console.log(boardObj.movesArr);
+    count++;
+    if (boardObj.movesArr.length>0){
+        for (var movestrings=0;movestrings<boardObj.movesArr.length;movestrings++){
+            boardObj.moveStrings.push(swapBoardString(boardObj.string,boardObj.movesArr[movestrings][0],boardObj.movesArr[movestrings][1]));
+        }
+    }
+    return boardObj;
+}
+
+function getFinalDepthMoveScores(board){
+    board.scores.push(getScore(board.string));
+}
+
+function getWorstCase(board){
+    var worstMove = 0;
+    for(var worstcase=0;worstcase<board.possibleNextBoards.length;worstcase++){
+        if (board.possibleNextBoards[worstcase].scores[0]<board.possibleNextBoards[worstMove].scores[0]){
+            worstMove = worstcase;
+        }
+    }
+    return worstMove;
+}
+function getBestCase(board){
+    var bestMove = 0;
+    for(var bestcase=0;bestcase<board.possibleNextBoards.length;bestcase++){
+        if (board.possibleNextBoards[bestcase].scores[0]>board.possibleNextBoards[bestMove].scores[0]){
+            bestMove = bestcase;
+        }
+    }
+    return bestMove;
+}
+function getCompMove(str){
+    var board = getBoardObjFromString(str,getAllMoves);
+    for (var nextboards=0;nextboards<board.movesArr.length;nextboards++){
+        board.possibleNextBoards.push(getBoardObjFromString(board.moveStrings[nextboards],getAllMoves));
+        for (var depth2=0;depth2<board.possibleNextBoards[nextboards].movesArr.length;depth2++){
+            //console.log(board.possibleNextBoards[nextboards].moveStrings[depth2]);
+            board.possibleNextBoards[nextboards].possibleNextBoards.push(getBoardObjFromString(board.possibleNextBoards[nextboards].moveStrings[depth2],function(){return[];}));
+            getFinalDepthMoveScores(board.possibleNextBoards[nextboards].possibleNextBoards[depth2]);
+        }
+        board.possibleNextBoards[nextboards].worstMove = {
+            index: getWorstCase(board.possibleNextBoards[nextboards]),
+            move: board.possibleNextBoards[nextboards].possibleNextBoards[getWorstCase(board.possibleNextBoards[nextboards])]
+        }
+        board.possibleNextBoards[nextboards].scores.push(board.possibleNextBoards[nextboards].worstMove.move.scores[0]);
+    }
+    board.bestMove = {
+        index: getBestCase(board),
+        move: board.possibleNextBoards[getBestCase(board)]
+    }
+    board.scores.push(board.bestMove.move.scores[0]);
+    console.log(board);
+    console.log(board.possibleNextBoards);
+    Destination(board.movesArr[board.bestMove.index][0],board.movesArr[board.bestMove.index][1],str);
+    doThing();
+}
+/*
+*
+*
+*
+*
+*
+*
+*/
 var boardString = 'bRbNbBbQbKbBbNbR'
 //var boardString = "";
 for (var pawnCountb=0;pawnCountb<8;pawnCountb++){
@@ -1103,15 +1279,6 @@ for (var pawnCountw=0;pawnCountw<8;pawnCountw++){
     
 }
 boardString += 'wRwNwBwQwKwBwNwRw';
-/*
-for(var staleString=0;staleString<7;staleString++){
-    boardString += "ee"
-}
-boardString+= "wRbKeeeeeeeeeeeeeewBeeeeeeeeeeeeeewBwPeeeeeeeeeeeeeeeeeewPwK";
-for (var thisString=boardString.length;thisString<128;thisString++){
-    boardString+="ee";
-}
-boardString +='w';*/
 var board = newBoard(boardString);
 var canCastle = {
     wKmoved : 0,
